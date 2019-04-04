@@ -1,17 +1,16 @@
 #pragma once
 
-typedef struct AccessibilityFile {
+typedef struct AccessibilityVideoFile {
 	char* path;
 	float playRate;
 	int brightness;
 	int noiseReduction;
-} AccessibilityFile;
+} AccessibilityVideoFile;
 
 typedef struct UserConfiguration {
 	char *accessibilityMode;
 	float userPlayRate;
-	int userbrightness;
-	int usernoiseReduction;
+	int userBrightness;
+	int userNoiseReduction;
 } UserConfiguration;
-#pragma once
-#pragma once
+
