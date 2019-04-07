@@ -15,8 +15,11 @@ sqlite3* connectToDB();
 
 void insertANewyVideoFile(sqlite3 *db, AccessibilityVideoFile newFile);
 
-static int callback(void *NotUsed, int argc, char **argv, char **azColName);
+static int callbackForInsert(void *NotUsed, int argc, char **argv, char **azColName);
 
+void selectVideoFileFromDB(sqlite3 *db);
+
+static int callbackForSelect(void *data, int argc, char **argv, char **azColName);
 
 
 bool checkIfVideoAccessibilityIsOn();

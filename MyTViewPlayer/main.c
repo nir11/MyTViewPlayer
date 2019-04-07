@@ -16,5 +16,12 @@ int main(void)
 	newFile.noiseReduction = 90;
 
 	/* insert newFile into the DB */
-	insertANewyVideoFile(db, newFile);
+	//insertANewyVideoFile(db, newFile);
+	
+
+	AccessibilityVideoFile currFile;
+	/* get the first file from the queue in the DB */
+	selectVideoFileFromDB(db);
+
+
 }

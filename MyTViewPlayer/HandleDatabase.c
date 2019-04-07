@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "HandleDatabase.h"
 #include <stdbool.h>
+#include "AccessibilityStructures.h"
 
 
 /*להשתמש בקוד מ:
@@ -63,7 +64,7 @@ void insertANewyVideoFile(sqlite3 *db, AccessibilityVideoFile newFile) {
 
 
 	/* Execute SQL statement */
-	rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
+	rc = sqlite3_exec(db, sql, callbackForInsert, 0, &zErrMsg);
 
 	if (rc != SQLITE_OK) {
 		fprintf(stderr, "SQL error: %s\n", zErrMsg);
@@ -76,7 +77,7 @@ void insertANewyVideoFile(sqlite3 *db, AccessibilityVideoFile newFile) {
 	return 0;
 }
 
-static int callback(void *NotUsed, int argc, char **argv, char **azColName) {
+static int callbackForInsert(void *NotUsed, int argc, char **argv, char **azColName) {
 	int i;
 	for (i = 0; i < argc; i++) {
 		printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
@@ -85,11 +86,59 @@ static int callback(void *NotUsed, int argc, char **argv, char **azColName) {
 	return 0;
 }
 
+void selectVideoFileFromDB(sqlite3 *db) {
+
+	AccessibilityVideoFile currFile;
+	char *zErrMsg = 0;
+	int rc;
+	char *sql;
+	const char* data = "Callback function called";
+
+	/* Open database */
+	rc = sqlite3_open("MyTViewDB.db", &db);
+
+	if (rc) {
+		fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
+	}
+	else {
+		fprintf(stderr, "Opened database successfully\n");
+	}
+
+	/* Create SQL statement */
+	sql = "SELECT * from AccessibilityVideoFiles LIMIT 1";
 
 
+	/* Execute SQL statement */
+	rc = sqlite3_exec(db, sql, callbackForSelect, (void*)data, &zErrMsg);
+	
+	if (rc != SQLITE_OK) {
+		fprintf(stderr, "SQL error: %s\n", zErrMsg);
+		sqlite3_free(zErrMsg);
+	}
+	else {
+		fprintf(stdout, "Operation done successfully\n");
+		/*currFile.path = malloc(sizeof(data[1]));
+		strcpy(currFile.path, data[1]);
+		currFile.playRate = data[2];
+		currFile.brightness = data[3];
+		currFile.noiseReduction = data[4];
+		printf("Path: %s\nPlay Rate: %f\nBrightness: %d\nnNoise Reduction: %d", currFile.path, currFile.playRate, currFile.brightness, currFile.noiseReduction);*/
 
+	}
+	sqlite3_close(db);
+}
 
+static int callbackForSelect(void *data, int argc, char **argv, char **azColName) {
+	int i;
+	fprintf(stderr, "%s: ", (const char*)data);
 
+	for (i = 0; i < argc; i++) {
+		printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
+	}
+
+	printf("\n");
+	return 0;
+}
 
 
 
