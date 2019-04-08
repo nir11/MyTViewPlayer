@@ -21,7 +21,10 @@ int main(void)
 
 	AccessibilityVideoFile currFile;
 	/* get the first file from the queue in the DB */
-	selectVideoFileFromDB(db);
-
-
+	//selectVideoFileFromDB(db);
+	
+	setMyTViewOnAndOff(db, "1");
+	setAccessibilityMode(db, "Fixed");
+	
+	setUserPlayRate(db, 98);
 }

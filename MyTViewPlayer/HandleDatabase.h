@@ -17,9 +17,20 @@ void insertANewyVideoFile(sqlite3 *db, AccessibilityVideoFile newFile);
 
 static int callbackForInsert(void *NotUsed, int argc, char **argv, char **azColName);
 
-void selectVideoFileFromDB(sqlite3 *db);
+void getVideoFileFromDB(sqlite3 *db);
 
-static int callbackForSelect(void *data, int argc, char **argv, char **azColName);
+static int callback(void *data, int argc, char **argv, char **azColName);
+
+void setMyTViewOnAndOff(sqlite3 *db, char* mode);
+
+void setAccessibilityMode(sqlite3 *db, char *accessibilityMode);
+
+void setUserPlayRate(sqlite3 *db, float userPlayRate);
+
+void setUserBrightness(sqlite3 *db, int userBrightness);
+
+void setUserNoiseReduction(sqlite3 *db, int userNoiseReduction);
+
 
 
 bool checkIfVideoAccessibilityIsOn();
@@ -28,13 +39,6 @@ bool checkIfExist();
 
 void updateUserConfiguration(UserConfiguration userConfiguration);
 
-void setAccessibilityMode(char *accessibilityMode);
-
-void setUserPlayRate(float userPlayRate);
-
-void setUserBrightness(int userBrightness);
-
-void setUserNoiseReduction(int userNoiseReduction);
 
 void setUserConfigurationAsDefault();
 

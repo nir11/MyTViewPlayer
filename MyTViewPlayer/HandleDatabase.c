@@ -4,7 +4,6 @@
 #include <stdbool.h>
 #include "AccessibilityStructures.h"
 
-
 /*להשתמש בקוד מ:
 https://www.tutorialspoint.com/sqlite/sqlite_c_cpp.htm
 */
@@ -86,7 +85,7 @@ static int callbackForInsert(void *NotUsed, int argc, char **argv, char **azColN
 	return 0;
 }
 
-void selectVideoFileFromDB(sqlite3 *db) {
+void getVideoFileFromDB(sqlite3 *db) {
 
 	AccessibilityVideoFile currFile;
 	char *zErrMsg = 0;
@@ -109,7 +108,7 @@ void selectVideoFileFromDB(sqlite3 *db) {
 
 
 	/* Execute SQL statement */
-	rc = sqlite3_exec(db, sql, callbackForSelect, (void*)data, &zErrMsg);
+	rc = sqlite3_exec(db, sql, callback, (void*)data, &zErrMsg);
 	
 	if (rc != SQLITE_OK) {
 		fprintf(stderr, "SQL error: %s\n", zErrMsg);
@@ -128,7 +127,7 @@ void selectVideoFileFromDB(sqlite3 *db) {
 	sqlite3_close(db);
 }
 
-static int callbackForSelect(void *data, int argc, char **argv, char **azColName) {
+static int callback(void *data, int argc, char **argv, char **azColName) {
 	int i;
 	fprintf(stderr, "%s: ", (const char*)data);
 
@@ -140,6 +139,102 @@ static int callbackForSelect(void *data, int argc, char **argv, char **azColName
 	return 0;
 }
 
+void setMyTViewOnAndOff(sqlite3 *db, char* mode) {
+	char *zErrMsg = 0;
+	int rc;
+	char *sql;
+	const char* data = "Callback function called";
+
+	/* Open database */
+	rc = sqlite3_open("MyTViewDB.db", &db);
+
+	/* Create merged SQL statement */
+	if (mode == "0") {
+		sql = "UPDATE UserConfiguration set video_accessibility = 0;" \
+			"SELECT * from UserConfiguration";
+	}
+	else {
+		sql = "UPDATE UserConfiguration set video_accessibility = 1;" \
+			"SELECT * from UserConfiguration";
+	}
+	
+	/* Execute SQL statement */
+	rc = sqlite3_exec(db, sql, callback, (void*)data, &zErrMsg);
+
+	if (rc != SQLITE_OK) {
+		fprintf(stderr, "SQL error: %s\n", zErrMsg);
+		sqlite3_free(zErrMsg);
+	}
+	else {
+		fprintf(stdout, "Operation done successfully\n");
+	}
+	sqlite3_close(db);
+}
+
+void setAccessibilityMode(sqlite3 *db, char *accessibilityMode) {
+	char *zErrMsg = 0;
+	int rc;
+	char *sql;
+	const char* data = "Callback function called";
+
+	/* Open database */
+	rc = sqlite3_open("MyTViewDB.db", &db);
+
+	/* Create merged SQL statement */
+	if (accessibilityMode == "Automatic") {
+		sql = "UPDATE UserConfiguration set accessibility_mode = 'Automatic';" \
+			"SELECT * from UserConfiguration";
+	}
+	else {
+		sql = "UPDATE UserConfiguration set accessibility_mode = 'Fixed';" \
+			"SELECT * from UserConfiguration";
+	}
+
+	/* Execute SQL statement */
+	rc = sqlite3_exec(db, sql, callback, (void*)data, &zErrMsg);
+
+	if (rc != SQLITE_OK) {
+		fprintf(stderr, "SQL error: %s\n", zErrMsg);
+		sqlite3_free(zErrMsg);
+	}
+	else {
+		fprintf(stdout, "Operation done successfully\n");
+	}
+	sqlite3_close(db);
+}
+
+void setUserPlayRate(sqlite3 *db, int userPlayRate) {
+	char *zErrMsg = 0;
+	int rc;
+	char *sql;
+	const char* data = "Callback function called";
+
+	/* Open database */
+	rc = sqlite3_open("MyTViewDB.db", &db);
+
+	/* Create merged SQL statement */
+	sql = "UPDATE UserConfiguration set user_play_rate = '98';" \
+		"SELECT * from UserConfiguration";
+	
+	/* Execute SQL statement */
+	rc = sqlite3_exec(db, sql, callback, (void*)data, &zErrMsg);
+
+	if (rc != SQLITE_OK) {
+		fprintf(stderr, "SQL error: %s\n", zErrMsg);
+		sqlite3_free(zErrMsg);
+	}
+	else {
+		fprintf(stdout, "Operation done successfully\n");
+	}
+	sqlite3_close(db);
+}
+
+void setUserBrightness(sqlite3 *db, int userBrightness) {}
+
+void setUserNoiseReduction(sqlite3 *db, int userNoiseReduction) {}
+
+
+
 
 
 
@@ -148,14 +243,6 @@ bool checkIfVideoAccessibilityIsOn(){}
 bool checkIfExist(){}
 
 void updateUserConfiguration(UserConfiguration userConfiguration) {}
-
-void setAccessibilityMode(char *accessibilityMode) {}
-
-void setUserPlayRate(float userPlayRate) {}
-
-void setUserBrightness(int userBrightness) {}
-
-void setUserNoiseReduction(int userNoiseReduction) {}
 
 void setUserConfigurationAsDefault() {}
 
@@ -167,3 +254,11 @@ AccessibilityVideoFile getNextFile() {}
 
 
 
+char* concat(const char *s1, const char *s2)
+{
+	char *result = malloc(strlen(s1) + strlen(s2) + 1); // +1 for the null-terminator
+	// in real code you would check for errors in malloc here
+	strcpy(result, s1);
+	strcat(result, s2);
+	return result;
+}
