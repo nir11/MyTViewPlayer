@@ -1,8 +1,11 @@
-
+#include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "HandleDatabase.h"
 #include <stdbool.h>
 #include "AccessibilityStructures.h"
+
+#define MAXCHAR 20
 
 /*להשתמש בקוד מ:
 https://www.tutorialspoint.com/sqlite/sqlite_c_cpp.htm
@@ -34,7 +37,7 @@ sqlite3* connectToDB() {
 	return db;
 }
 
-void insertANewyVideoFile(sqlite3 *db, AccessibilityVideoFile newFile) {
+int insertANewyVideoFile(sqlite3 *db, AccessibilityVideoFile newFile) {
 	
 	char *zErrMsg = 0;
 	int rc;
@@ -45,7 +48,7 @@ void insertANewyVideoFile(sqlite3 *db, AccessibilityVideoFile newFile) {
 
 	if (rc) {
 		fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
-		return(0);
+		return -1; // return error code
 	}
 	else {
 		fprintf(stderr, "Opened database successfully\n");
@@ -87,7 +90,7 @@ static int callbackForInsert(void *NotUsed, int argc, char **argv, char **azColN
 
 void getVideoFileFromDB(sqlite3 *db) {
 
-	AccessibilityVideoFile currFile;
+	AccessibilityVideoFile* currFile=NULL;
 	char *zErrMsg = 0;
 	int rc;
 	char *sql;
@@ -203,7 +206,7 @@ void setAccessibilityMode(sqlite3 *db, char *accessibilityMode) {
 	sqlite3_close(db);
 }
 
-void setUserPlayRate(sqlite3 *db, int userPlayRate) {
+void setUserPlayRate(sqlite3 *db, float userPlayRate) {
 	char *zErrMsg = 0;
 	int rc;
 	char *sql;
@@ -238,9 +241,15 @@ void setUserNoiseReduction(sqlite3 *db, int userNoiseReduction) {}
 
 
 
-bool checkIfVideoAccessibilityIsOn(){}
+bool checkIfVideoAccessibilityIsOn(){
+	//temp
+	return true;
+}
 
-bool checkIfExist(){}
+bool checkIfExist(){
+	//temp
+	return true;
+}
 
 void updateUserConfiguration(UserConfiguration userConfiguration) {}
 
@@ -248,17 +257,23 @@ void setUserConfigurationAsDefault() {}
 
 void resetPlaylist() {}
 
-UserConfiguration getUserConfiguration() {}
+UserConfiguration* getUserConfiguration() {
+	//temp
+	return NULL;
+}
 
-AccessibilityVideoFile getNextFile() {}
+AccessibilityVideoFile* getNextFile() {
+	//temp
+	return NULL;
+}
 
 
 
 char* concat(const char *s1, const char *s2)
 {
-	char *result = malloc(strlen(s1) + strlen(s2) + 1); // +1 for the null-terminator
+	char *result =(char*) malloc(MAXCHAR); // +1 for the null-terminator
 	// in real code you would check for errors in malloc here
-	strcpy(result, s1);
-	strcat(result, s2);
+	strcpy_s(result, MAXCHAR, s1);
+	strcat_s(result, MAXCHAR, s2);
 	return result;
 }
