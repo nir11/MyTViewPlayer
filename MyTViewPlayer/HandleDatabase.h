@@ -16,9 +16,7 @@ int insertANewyVideoFile(AccessibilityVideoFile newFile);
 
 static int callbackForInsert(void *NotUsed, int argc, char **argv, char **azColName);
 
-void getVideoFileFromDB();
-
-static int callback(void *data, int argc, char **argv, char **azColName);
+AccessibilityVideoFile* getVideoFileFromDB();
 
 void setMyTViewOnAndOff(char* mode);
 

@@ -62,16 +62,13 @@ static int callbackForInsert(void *NotUsed, int argc, char **argv, char **azColN
 }
 
 
-
-
-void getVideoFileFromDB() {
-
+AccessibilityVideoFile* getVideoFileFromDB() {
+	AccessibilityVideoFile* currVideoFile;
+	currVideoFile = (struct AccessibilityVideoFile*) malloc(sizeof(struct AccessibilityVideoFile));
 	sqlite3 *db;
-	AccessibilityVideoFile* currFile=NULL;
-	char *zErrMsg = 0;
+	sqlite3_stmt *res;
+	const char *tail;
 	int rc;
-	char *sql;
-	const char* data = "Callback function called";
 
 	/* Open database */
 	rc = sqlite3_open("MyTViewDB.db", &db);
@@ -83,43 +80,38 @@ void getVideoFileFromDB() {
 		fprintf(stderr, "Opened database successfully\n");
 	}
 
-	/* Create SQL statement */
-	sql = "SELECT * from AccessibilityVideoFiles LIMIT 1";
-
-
-	/* Execute SQL statement */
-	rc = sqlite3_exec(db, sql, callback, (void*)data, &zErrMsg);
-	
-	if (rc != SQLITE_OK) {
-		fprintf(stderr, "SQL error: %s\n", zErrMsg);
-		sqlite3_free(zErrMsg);
+	if (sqlite3_prepare_v2(db, "SELECT * from AccessibilityVideoFiles LIMIT 1", 128, &res, &tail) != SQLITE_OK)
+	{
+		sqlite3_close(db);
+		printf("Can't retrieve data: %s\n", sqlite3_errmsg(db));
+		return NULL;
 	}
-	else {
-		fprintf(stdout, "Operation done successfully\n");
-		/*currFile.path = malloc(sizeof(data[1]));
-		strcpy(currFile.path, data[1]);
-		currFile.playRate = data[2];
-		currFile.brightness = data[3];
-		currFile.noiseReduction = data[4];
-		printf("Path: %s\nPlay Rate: %f\nBrightness: %d\nnNoise Reduction: %d", currFile.path, currFile.playRate, currFile.brightness, currFile.noiseReduction);*/
 
+	printf("Reading data...\n");
+
+	while (sqlite3_step(res) == SQLITE_ROW)
+	{
+		currVideoFile->path = malloc(strlen(sqlite3_column_text(res, 1)) + 1);
+		strcpy_s(currVideoFile->path,strlen(sqlite3_column_text(res, 1))+1, sqlite3_column_text(res, 1));
+		//printf("%s\n", currVideoFile->path);
+
+		currVideoFile->playRate = sqlite3_column_double(res, 2);
+		//printf("%.2lf\n", currVideoFile->playRate);
+
+		currVideoFile->brightness = sqlite3_column_double(res, 3);
+		//printf("%.2lf\n", currVideoFile->brightness);
+
+		currVideoFile->noiseReduction = sqlite3_column_double(res, 4);
+		//printf("%.2lf\n", currVideoFile->noiseReduction);
 	}
+
+
+	sqlite3_finalize(res);
+
 	sqlite3_close(db);
+
+	return currVideoFile;
 }
-
-static int callback(void *data, int argc, char **argv, char **azColName) {
-	int i;
-	fprintf(stderr, "%s: ", (const char*)data);
-
-	for (i = 0; i < argc; i++) {
-		printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
-	}
-
-	printf("\n");
-	return 0;
-}
-
-
 
 
 
