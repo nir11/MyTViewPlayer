@@ -13,7 +13,7 @@ If the database does not exist, then it will be created and finally a database o
 */
 sqlite3* connectToDB();
 
-void insertANewyVideoFile(sqlite3 *db, AccessibilityVideoFile newFile);
+int insertANewyVideoFile(sqlite3 *db, AccessibilityVideoFile newFile);
 
 static int callbackForInsert(void *NotUsed, int argc, char **argv, char **azColName);
 
@@ -44,9 +44,9 @@ void setUserConfigurationAsDefault();
 
 void resetPlaylist();
 
-UserConfiguration getUserConfiguration();
+UserConfiguration* getUserConfiguration();
 
-AccessibilityVideoFile getNextFile();
+AccessibilityVideoFile* getNextFile();
 
 
 
