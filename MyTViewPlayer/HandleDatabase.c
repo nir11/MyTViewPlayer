@@ -15,33 +15,13 @@ https://www.tutorialspoint.com/sqlite/sqlite_c_cpp.htm
 Following C code segment shows how to connect to an existing database "MyTViewDB.db".
 If the database does not exist, then it will be created and finally a database object will be returned.
 */
-sqlite3* connectToDB() {
-	sqlite3 *db;			// database connection
-	char *zErrMsg = 0;		// pointer to an error string
-	int rc;					// return code
 
-	/*
-	 * open SQLite database file test.db
-	 * use ":memory:" to use an in-memory database
-	 */
-	rc = sqlite3_open("MyTViewDB.db", &db);
-
-	if (rc) {
-		fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
-		return(0);
-	}
-	else {
-		fprintf(stderr, "Opened database successfully\n");
-	}
-	//sqlite3_close(db);
-	return db;
-}
-
-int insertANewyVideoFile(sqlite3 *db, AccessibilityVideoFile newFile) {
+int insertANewyVideoFile(AccessibilityVideoFile newFile) {
 	
+	sqlite3 *db;
 	char *zErrMsg = 0;
 	int rc;
-	char *sql;
+	char *sql =(char*) malloc(1);
 
 	/* Open database */
 	rc = sqlite3_open("MyTViewDB.db", &db);
@@ -54,16 +34,9 @@ int insertANewyVideoFile(sqlite3 *db, AccessibilityVideoFile newFile) {
 		fprintf(stderr, "Opened database successfully\n");
 	}
 
-
 	/* Create SQL statement */
-	/*צריכים למצוא דרך לשרשר צ'אר ואינט בשורה התחתונה*/
-	/*sql = "INSERT INTO AccessibilityVideoFiles (path,play_rate,brightness,noise_reduction) "  \
-		"VALUES (newFile.path, newFile.playRate, newFile.brightness, newFile.noiseReduction);";*/
-
-	/* Create SQL statement */
-	sql = "INSERT INTO AccessibilityVideoFiles (path,play_rate,brightness,noise_reduction) "  \
-		"VALUES ('C:\\MyTView\\videos\\samplevide1.3gp', 1.3, 85, 90);";
-
+	sprintf_s(sql,250, "INSERT INTO AccessibilityVideoFiles (path,play_rate,brightness,noise_reduction) "  \
+		"VALUES ('%s',%.2lf,%.2lf,%.2lf);", newFile.path, newFile.playRate, newFile.brightness, newFile.noiseReduction);
 
 	/* Execute SQL statement */
 	rc = sqlite3_exec(db, sql, callbackForInsert, 0, &zErrMsg);
@@ -88,8 +61,12 @@ static int callbackForInsert(void *NotUsed, int argc, char **argv, char **azColN
 	return 0;
 }
 
-void getVideoFileFromDB(sqlite3 *db) {
 
+
+
+void getVideoFileFromDB() {
+
+	sqlite3 *db;
 	AccessibilityVideoFile* currFile=NULL;
 	char *zErrMsg = 0;
 	int rc;
@@ -142,7 +119,13 @@ static int callback(void *data, int argc, char **argv, char **azColName) {
 	return 0;
 }
 
-void setMyTViewOnAndOff(sqlite3 *db, char* mode) {
+
+
+
+
+
+void setMyTViewOnAndOff(char* mode) {
+	sqlite3 *db;
 	char *zErrMsg = 0;
 	int rc;
 	char *sql;
@@ -174,7 +157,8 @@ void setMyTViewOnAndOff(sqlite3 *db, char* mode) {
 	sqlite3_close(db);
 }
 
-void setAccessibilityMode(sqlite3 *db, char *accessibilityMode) {
+void setAccessibilityMode(char *accessibilityMode) {
+	sqlite3 *db;
 	char *zErrMsg = 0;
 	int rc;
 	char *sql;
@@ -206,7 +190,8 @@ void setAccessibilityMode(sqlite3 *db, char *accessibilityMode) {
 	sqlite3_close(db);
 }
 
-void setUserPlayRate(sqlite3 *db, float userPlayRate) {
+void setUserPlayRate(float userPlayRate) {
+	sqlite3 *db;
 	char *zErrMsg = 0;
 	int rc;
 	char *sql;
@@ -232,9 +217,9 @@ void setUserPlayRate(sqlite3 *db, float userPlayRate) {
 	sqlite3_close(db);
 }
 
-void setUserBrightness(sqlite3 *db, int userBrightness) {}
+void setUserBrightness(int userBrightness) {}
 
-void setUserNoiseReduction(sqlite3 *db, int userNoiseReduction) {}
+void setUserNoiseReduction(int userNoiseReduction) {}
 
 
 

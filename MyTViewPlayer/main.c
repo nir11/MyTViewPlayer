@@ -7,28 +7,29 @@
 
 int main(void)
 {
-	sqlite3 *db = connectToDB();			// database connection
-	AccessibilityVideoFile newFile;
-	char path[] = "C:\\MyTView\\videos\\samplevide1.3gp";
+	//sqlite3 *db = connectToDB();			// database connecti
 
-	/* newFile specification */
-	newFile.path = malloc(strlen(path)+1);
-	strcpy_s(newFile.path,strlen(path)+1, path);
-	printf(newFile.path); //check
-	newFile.playRate = (float)1.3;
-	newFile.brightness = 85;
-	newFile.noiseReduction = 90;
 
-	/* insert newFile into the DB */
-	//insertANewyVideoFile(db, newFile);
+	//AccessibilityVideoFile newFile;
+	//char* path = "C:\\MyTView\\videos\\samplevide1.3gp";
+
+	///* newFile specification */
+	//newFile.path = malloc(strlen(path)+1);
+	//strcpy_s(newFile.path,strlen(path)+1, path);
+	//newFile.playRate = 1.3;
+	//newFile.brightness = 35;
+	//newFile.noiseReduction = 4;
+
+	///* insert newFile into the DB */
+	//insertANewyVideoFile(newFile);
 	
 
 	AccessibilityVideoFile* currFile=NULL;
 	/* get the first file from the queue in the DB */
-	//selectVideoFileFromDB(db);
+	getVideoFileFromDB();
 	
-	setMyTViewOnAndOff(db, "1");
+	/*setMyTViewOnAndOff(db, "1");
 	setAccessibilityMode(db, "Fixed");
 	
-	setUserPlayRate(db, 98);
+	setUserPlayRate(db, 98);*/
 }

@@ -11,25 +11,24 @@
 Following C code segment shows how to connect to an existing database.
 If the database does not exist, then it will be created and finally a database object will be returned.
 */
-sqlite3* connectToDB();
 
-int insertANewyVideoFile(sqlite3 *db, AccessibilityVideoFile newFile);
+int insertANewyVideoFile(AccessibilityVideoFile newFile);
 
 static int callbackForInsert(void *NotUsed, int argc, char **argv, char **azColName);
 
-void getVideoFileFromDB(sqlite3 *db);
+void getVideoFileFromDB();
 
 static int callback(void *data, int argc, char **argv, char **azColName);
 
-void setMyTViewOnAndOff(sqlite3 *db, char* mode);
+void setMyTViewOnAndOff(char* mode);
 
-void setAccessibilityMode(sqlite3 *db, char *accessibilityMode);
+void setAccessibilityMode(char *accessibilityMode);
 
-void setUserPlayRate(sqlite3 *db, float userPlayRate);
+void setUserPlayRate(float userPlayRate);
 
-void setUserBrightness(sqlite3 *db, int userBrightness);
+void setUserBrightness(int userBrightness);
 
-void setUserNoiseReduction(sqlite3 *db, int userNoiseReduction);
+void setUserNoiseReduction(int userNoiseReduction);
 
 
 
