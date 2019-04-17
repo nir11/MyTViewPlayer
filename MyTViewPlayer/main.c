@@ -24,11 +24,19 @@ int main(void)
 	//insertANewyVideoFile(newFile);
 	
 
-	AccessibilityVideoFile* currVideoFile = getVideoFileFromDBA();
-	printf("Path: %s\n", currVideoFile->path);
-	printf("Play Rate: %.2lf\n", currVideoFile->playRate);
-	printf("Brightness: %.2lf\n", currVideoFile->brightness);
-	printf("NoiseReduction: %.2lf\n", currVideoFile->noiseReduction);
+	/*AccessibilityVideoFile* currVideoFile = getFirstVideoFileFromQueue();
+	while (currVideoFile != NULL) {
+		printf("Path: %s\n", currVideoFile->path);
+		printf("Play Rate: %.2lf\n", currVideoFile->playRate);
+		printf("Brightness: %.2lf\n", currVideoFile->brightness);
+		printf("NoiseReduction: %.2lf\n", currVideoFile->noiseReduction);
+
+		if (deleteFirstVideoFileFromQueue()); {
+			currVideoFile = getFirstVideoFileFromQueue();
+		}
+	}*/
+
+	setMyTViewOnAndOff();
 
 	/* get the first file from the queue in the DB */
 	//getVideoFileFromDB();

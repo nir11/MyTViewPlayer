@@ -16,9 +16,14 @@ int insertANewyVideoFile(AccessibilityVideoFile newFile);
 
 static int callbackForInsert(void *NotUsed, int argc, char **argv, char **azColName);
 
-AccessibilityVideoFile* getVideoFileFromDB();
+AccessibilityVideoFile* getFirstVideoFileFromQueue();
 
-void setMyTViewOnAndOff(char* mode);
+bool deleteFirstVideoFileFromQueue();
+
+static int callback(void *data, int argc, char **argv, char **azColName);
+
+
+int setMyTViewOnAndOff();
 
 void setAccessibilityMode(char *accessibilityMode);
 

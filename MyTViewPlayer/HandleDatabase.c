@@ -61,8 +61,7 @@ static int callbackForInsert(void *NotUsed, int argc, char **argv, char **azColN
 	return 0;
 }
 
-
-AccessibilityVideoFile* getVideoFileFromDB() {
+AccessibilityVideoFile* getFirstVideoFileFromQueue() {
 	AccessibilityVideoFile* currVideoFile;
 	currVideoFile = (struct AccessibilityVideoFile*) malloc(sizeof(struct AccessibilityVideoFile));
 	sqlite3 *db;
@@ -113,10 +112,8 @@ AccessibilityVideoFile* getVideoFileFromDB() {
 	return currVideoFile;
 }
 
+bool deleteFirstVideoFileFromQueue() {
 
-
-
-void setMyTViewOnAndOff(char* mode) {
 	sqlite3 *db;
 	char *zErrMsg = 0;
 	int rc;
@@ -126,16 +123,17 @@ void setMyTViewOnAndOff(char* mode) {
 	/* Open database */
 	rc = sqlite3_open("MyTViewDB.db", &db);
 
-	/* Create merged SQL statement */
-	if (mode == "0") {
-		sql = "UPDATE UserConfiguration set video_accessibility = 0;" \
-			"SELECT * from UserConfiguration";
+	if (rc) {
+		fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
+		return false;
 	}
 	else {
-		sql = "UPDATE UserConfiguration set video_accessibility = 1;" \
-			"SELECT * from UserConfiguration";
+		fprintf(stderr, "Opened database successfully\n");
 	}
-	
+
+	/* Create merged SQL statement */
+	sql = "DELETE from AccessibilityVideoFiles where ROWID=1;";
+
 	/* Execute SQL statement */
 	rc = sqlite3_exec(db, sql, callback, (void*)data, &zErrMsg);
 
@@ -147,7 +145,99 @@ void setMyTViewOnAndOff(char* mode) {
 		fprintf(stdout, "Operation done successfully\n");
 	}
 	sqlite3_close(db);
+	return true;
 }
+
+static int callback(void *data, int argc, char **argv, char **azColName) {
+	int i;
+	fprintf(stderr, "%s: ", (const char*)data);
+
+	for (i = 0; i < argc; i++) {
+		printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
+	}
+	printf("\n");
+	return 0;
+}
+
+int getVideoAccessibility() {
+	int currVideoAccessibility;
+	sqlite3 *db;
+	sqlite3_stmt *res;
+	const char *tail;
+	int rc;
+
+	/* Open database */
+	rc = sqlite3_open("MyTViewDB.db", &db);
+
+	if (rc) {
+		fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
+		return -1;
+	}
+	else {
+		fprintf(stderr, "Opened database successfully\n");
+	}
+
+	if (sqlite3_prepare_v2(db, "SELECT video_accessibility from UserConfiguration LIMIT 1", 128, &res, &tail) != SQLITE_OK)
+	{
+		sqlite3_close(db);
+		printf("Can't retrieve data: %s\n", sqlite3_errmsg(db));
+		return NULL;
+	}
+
+	printf("Reading data...\n");
+
+	while (sqlite3_step(res) == SQLITE_ROW)
+	{
+		currVideoAccessibility = sqlite3_column_int(res, 0);
+		printf("%d", currVideoAccessibility);
+	}
+
+	sqlite3_finalize(res);
+
+	sqlite3_close(db);
+
+	return currVideoAccessibility;
+}
+
+int setMyTViewOnAndOff() {
+	sqlite3 *db;
+	char *zErrMsg = 0;
+	int rc;
+	char *sql;
+	const char* data = "Callback function called";
+
+	/* Open database */
+	rc = sqlite3_open("MyTViewDB.db", &db);
+
+	/* Create merged SQL statement */
+	if (getVideoAccessibility() == 0) {
+		sql = "UPDATE UserConfiguration set video_accessibility = 1;" \
+			"SELECT * from UserConfiguration";
+	}
+	else if (getVideoAccessibility() == 1) {
+		sql = "UPDATE UserConfiguration set video_accessibility = 0;" \
+			"SELECT * from UserConfiguration";
+	}
+	else
+		return -1;
+	
+	
+	/* Execute SQL statement */
+	rc = sqlite3_exec(db, sql, callback, (void*)data, &zErrMsg);
+
+	if (rc != SQLITE_OK) {
+		fprintf(stderr, "SQL error: %s\n", zErrMsg);
+		sqlite3_free(zErrMsg);
+		return -1;
+	}
+	else {
+		fprintf(stdout, "Operation done successfully\n");
+	}
+	sqlite3_close(db);
+	return 1;
+}
+
+
 
 void setAccessibilityMode(char *accessibilityMode) {
 	sqlite3 *db;
