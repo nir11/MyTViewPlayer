@@ -132,7 +132,7 @@ bool deleteFirstVideoFileFromQueue() {
 	}
 
 	/* Create merged SQL statement */
-	sql = "DELETE from AccessibilityVideoFiles where ROWID=1;";
+	sql = "DELETE FROM AccessibilityVideoFiles WHERE rowid in (select rowid FROM AccessibilityVideoFiles LIMIT 1);";
 
 	/* Execute SQL statement */
 	rc = sqlite3_exec(db, sql, callback, (void*)data, &zErrMsg);
@@ -181,7 +181,7 @@ int getVideoAccessibility() {
 	{
 		sqlite3_close(db);
 		printf("Can't retrieve data: %s\n", sqlite3_errmsg(db));
-		return NULL;
+		return -1;
 	}
 
 	printf("Reading data...\n");
