@@ -12,7 +12,7 @@ Following C code segment shows how to connect to an existing database.
 If the database does not exist, then it will be created and finally a database object will be returned.
 */
 
-int insertANewyVideoFile(AccessibilityVideoFile newFile);
+bool insertANewyVideoFile(AccessibilityVideoFile newFile);
 
 static int callbackForInsert(void *NotUsed, int argc, char **argv, char **azColName);
 

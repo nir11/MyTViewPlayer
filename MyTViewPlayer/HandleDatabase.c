@@ -16,7 +16,7 @@ Following C code segment shows how to connect to an existing database "MyTViewDB
 If the database does not exist, then it will be created and finally a database object will be returned.
 */
 
-int insertANewyVideoFile(AccessibilityVideoFile newFile) {
+bool insertANewyVideoFile(AccessibilityVideoFile newFile) {
 	
 	sqlite3 *db;
 	char *zErrMsg = 0;
@@ -27,29 +27,32 @@ int insertANewyVideoFile(AccessibilityVideoFile newFile) {
 	rc = sqlite3_open("MyTViewDB.db", &db);
 
 	if (rc) {
-		fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
-		return -1; // return error code
+		//fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
+		return false; // return error code
 	}
 	else {
-		fprintf(stderr, "Opened database successfully\n");
+		//fprintf(stderr, "Opened database successfully\n");
 	}
 
 	/* Create SQL statement */
-	sprintf_s(sql,250, "INSERT INTO AccessibilityVideoFiles (path,play_rate,brightness,noise_reduction) "  \
+	//char * query = "INSERT INTO AccessibilityVideoFiles (path,play_rate,brightness,noise_reduction) "  \
+		"VALUES ('%s',%.2lf,%.2lf,%.2lf);";
+	sql = sqlite3_mprintf("INSERT INTO AccessibilityVideoFiles (path,play_rate,brightness,noise_reduction) "  \
 		"VALUES ('%s',%.2lf,%.2lf,%.2lf);", newFile.path, newFile.playRate, newFile.brightness, newFile.noiseReduction);
-
+	
+	//sprintf_s(sql,500, query, newFile.path, newFile.playRate, newFile.brightness, newFile.noiseReduction);
+	
 	/* Execute SQL statement */
 	rc = sqlite3_exec(db, sql, callbackForInsert, 0, &zErrMsg);
-
 	if (rc != SQLITE_OK) {
-		fprintf(stderr, "SQL error: %s\n", zErrMsg);
+		//fprintf(stderr, "SQL error: %s\n", zErrMsg);
 		sqlite3_free(zErrMsg);
 	}
 	else {
-		fprintf(stdout, "Records created successfully\n");
+		//printf("Records created successfully\n");
 	}
 	sqlite3_close(db);
-	return 0;
+	return true;
 }
 
 static int callbackForInsert(void *NotUsed, int argc, char **argv, char **azColName) {
@@ -68,28 +71,31 @@ AccessibilityVideoFile* getFirstVideoFileFromQueue() {
 	sqlite3_stmt *res;
 	const char *tail;
 	int rc;
+	int count = 0;
 
 	/* Open database */
 	rc = sqlite3_open("MyTViewDB.db", &db);
 
 	if (rc) {
-		fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
+		//fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
+		return NULL;
 	}
 	else {
-		fprintf(stderr, "Opened database successfully\n");
+		//fprintf(stderr, "Opened database successfully\n");
 	}
 
 	if (sqlite3_prepare_v2(db, "SELECT * from AccessibilityVideoFiles LIMIT 1", 128, &res, &tail) != SQLITE_OK)
 	{
 		sqlite3_close(db);
-		printf("Can't retrieve data: %s\n", sqlite3_errmsg(db));
+		//printf("Can't retrieve data: %s\n", sqlite3_errmsg(db));
 		return NULL;
 	}
 
-	printf("Reading data...\n");
+	//printf("Reading data...\n");
 
 	while (sqlite3_step(res) == SQLITE_ROW)
 	{
+		count++;
 		currVideoFile->path = malloc(strlen(sqlite3_column_text(res, 1)) + 1);
 		strcpy_s(currVideoFile->path,strlen(sqlite3_column_text(res, 1))+1, sqlite3_column_text(res, 1));
 		//printf("%s\n", currVideoFile->path);
@@ -104,6 +110,11 @@ AccessibilityVideoFile* getFirstVideoFileFromQueue() {
 		//printf("%.2lf\n", currVideoFile->noiseReduction);
 	}
 
+	if (count == 0) {
+		sqlite3_close(db);
+		printf("Empty Queue!\n");
+		return NULL;
+	}
 
 	sqlite3_finalize(res);
 
@@ -124,11 +135,11 @@ bool deleteFirstVideoFileFromQueue() {
 	rc = sqlite3_open("MyTViewDB.db", &db);
 
 	if (rc) {
-		fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
+		//fprintf(stderr, "\nCan't open database: %s\n", sqlite3_errmsg(db));
 		return false;
 	}
 	else {
-		fprintf(stderr, "Opened database successfully\n");
+		//fprintf(stderr, "\nOpened database successfully\n");
 	}
 
 	/* Create merged SQL statement */
@@ -138,11 +149,12 @@ bool deleteFirstVideoFileFromQueue() {
 	rc = sqlite3_exec(db, sql, callback, (void*)data, &zErrMsg);
 
 	if (rc != SQLITE_OK) {
-		fprintf(stderr, "SQL error: %s\n", zErrMsg);
+		//fprintf(stderr, "SQL error: %s\n", zErrMsg);
 		sqlite3_free(zErrMsg);
+		return false;
 	}
 	else {
-		fprintf(stdout, "Operation done successfully\n");
+		//fprintf(stdout, "Operation done successfully\n");
 	}
 	sqlite3_close(db);
 	return true;
@@ -184,7 +196,7 @@ int getVideoAccessibility() {
 		return -1;
 	}
 
-	printf("Reading data...\n");
+	//printf("Reading data...\n");
 
 	while (sqlite3_step(res) == SQLITE_ROW)
 	{
